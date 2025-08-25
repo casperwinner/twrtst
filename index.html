@@ -1,0 +1,276 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎲 Tower Rush Предсказатель</title>
+<style>
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background: #1a1a2e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    width: 380px;
+    background: #2f2f50;
+    border-radius: 25px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    position: relative;
+}
+
+.language-switch {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 80px;
+    height: 32px;
+    background: #555666;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+    color: #fff;
+    user-select: none;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
+}
+
+.language-switch span {
+    width: 50%;
+    text-align: center;
+    z-index: 1;
+    line-height: 32px;
+}
+
+.slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background: #777888;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+}
+
+.language-switch.en .slider { left: 50%; }
+
+h1 {
+    color: #fff;
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+}
+
+button {
+    padding: 14px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(90deg, #ffcc33, #ffaa00);
+    border: none;
+    border-radius: 18px;
+    cursor: pointer;
+    margin: 20px 0;
+    box-shadow: 0 5px 15px rgba(255,215,0,0.4);
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255,215,0,0.6);
+}
+
+.result-block {
+    position: relative;
+    background: #1e1e3b;
+    border-radius: 20px;
+    padding: 35px 20px 60px 20px;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    box-shadow: inset 0 0 15px rgba(255,215,0,0.15);
+    overflow: hidden;
+}
+
+.tower-stack {
+    position: absolute;
+    bottom: 0;
+    right: 10px;
+    width: 50px;
+    height: auto;
+}
+
+.tower-block {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: #ffcc33;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(255,170,0,0.7);
+    transform: translateY(-400px);
+    animation: fall 0.6s forwards;
+}
+
+@keyframes fall { to { transform: translateY(0); } }
+
+.loader {
+    border: 5px solid rgba(255,255,255,0.2);
+    border-top: 5px solid #ffe600;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+    display: none;
+}
+
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.result-number {
+    font-size: 100px;
+    color: #ffe600;
+    font-weight: bold;
+    position: absolute;
+    top: 30%;
+    left: 40%;
+    transform: translate(-50%, -50%) scale(0.7);
+    opacity: 0;
+    transition: all 0.6s ease;
+}
+
+.blocks {
+    font-size: 19px;
+    color: #fff;
+    margin-top: 15px;
+    font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.tip {
+    font-size: 15px;
+    color: #ddd;
+    margin-top: 15px;
+    line-height: 1.4;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.6s ease 0.3s;
+}
+
+.show { opacity: 1; transform: translateY(0) scale(1); }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="language-switch" id="languageSwitch">
+        <span>RU</span><span>EN</span>
+        <div class="slider"></div>
+    </div>
+
+    <h1 id="title">🎲 TOWER RUSH</h1>
+
+    <div class="result-block">
+        <div class="tower-stack" id="towerStack"></div>
+        <div class="loader" id="loader"></div>
+        <div class="result-number" id="resultNumber">-</div>
+        <div class="blocks" id="blocksText">Сколько блоков ставить</div>
+    </div>
+
+    <button id="getSignal">Получить сигнал</button>
+
+    <div class="tip" id="tipText">
+        Если вы сделали больше чем xX от ставки, забирайте выигрыш! Даже если бот сказал ставить больше ставок
+    </div>
+</div>
+
+<script>
+let currentLang = 'RU';
+const texts = {
+    RU: {
+        title: '🎲 TOWER RUSH',
+        button: 'Получить сигнал',
+        blocks: 'Сколько блоков ставить',
+        tip: (m) => `Если вы сделали больше чем x${m} от ставки, забирайте выигрыш! Даже если бот сказал ставить больше ставок`,
+        loading: 'Подождите, идет анализ...'
+    },
+    EN: {
+        title: '🎲 TOWER RUSH',
+        button: 'Get Signal',
+        blocks: 'How many blocks to place',
+        tip: (m) => `If you made more than x${m} of your bet, take your winnings! Even if the bot suggested more bets`,
+        loading: 'Please wait, analyzing...'
+    }
+};
+
+const languageSwitch = document.getElementById('languageSwitch');
+languageSwitch.addEventListener('click', () => {
+    currentLang = currentLang === 'RU' ? 'EN' : 'RU';
+    languageSwitch.classList.toggle('en');
+    updateTexts();
+});
+
+function updateTexts() {
+    const t = texts[currentLang];
+    document.getElementById('title').textContent = t.title;
+    document.getElementById('getSignal').textContent = t.button;
+    document.getElementById('blocksText').textContent = t.blocks;
+    document.getElementById('tipText').textContent = t.tip('X');
+}
+
+function getRandomInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+function getRandomFloat(min,max,d=1){return (Math.random()*(max-min)+min).toFixed(d);}
+
+document.getElementById('getSignal').addEventListener('click', () => {
+    const loader = document.getElementById('loader');
+    const resultNumber = document.getElementById('resultNumber');
+    const tipText = document.getElementById('tipText');
+    const towerStack = document.getElementById('towerStack');
+
+    towerStack.innerHTML = '';
+    resultNumber.classList.remove('show');
+    tipText.classList.remove('show');
+
+    loader.style.display = 'block';
+    resultNumber.textContent = '-';
+    tipText.textContent = texts[currentLang].loading;
+
+    setTimeout(() => {
+        loader.style.display = 'none';
+        const number = getRandomInt(3,9);
+        const multiplier = getRandomFloat(1.9,3.7);
+
+        resultNumber.textContent = number;
+        tipText.textContent = texts[currentLang].tip(multiplier);
+        resultNumber.classList.add('show');
+        tipText.classList.add('show');
+
+        for(let i=0;i<number;i++){
+            const block = document.createElement('div');
+            block.className='tower-block';
+            block.style.bottom=`${i*40}px`;
+            block.style.left=`${Math.random()*10-5}px`;
+            block.style.animationDelay=`${i*0.3}s`;
+            towerStack.appendChild(block);
+        }
+    },1200);
+});
+</script>
+
+</body>
+</html>
+
