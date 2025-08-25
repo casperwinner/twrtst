@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -158,6 +158,7 @@ button:hover {
     margin-top: 15px;
     font-weight: bold;
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    white-space: pre-line; /* важно для переноса строки */
 }
 
 .tip {
@@ -188,7 +189,8 @@ button:hover {
         <div class="tower-stack" id="towerStack"></div>
         <div class="loader" id="loader"></div>
         <div class="result-number" id="resultNumber">-</div>
-        <div class="blocks" id="blocksText">Сколько блоков ставить</div>
+        <div class="blocks" id="blocksText">Сколько блоков
+ставить</div>
     </div>
 
     <button id="getSignal">Получить сигнал</button>
@@ -204,14 +206,14 @@ const texts = {
     RU: {
         title: '🎲 TOWER RUSH',
         button: 'Получить сигнал',
-        blocks: 'Сколько блоков ставить',
+        blocks: 'Сколько блоков\nставить',
         tip: (m) => `Если вы сделали больше чем x${m} от ставки, забирайте выигрыш! Даже если бот сказал ставить больше ставок`,
         loading: 'Подождите, идет анализ...'
     },
     EN: {
         title: '🎲 TOWER RUSH',
         button: 'Get Signal',
-        blocks: 'How many blocks to place',
+        blocks: 'How many blocks\nto place',
         tip: (m) => `If you made more than x${m} of your bet, take your winnings! Even if the bot suggested more bets`,
         loading: 'Please wait, analyzing...'
     }
