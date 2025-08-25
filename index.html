@@ -114,7 +114,6 @@ button:hover {
     height: auto;
 }
 
-/* Блок как в игре */
 .tower-block {
     position: absolute;
     width: 40px;
@@ -159,7 +158,7 @@ button:hover {
     margin-top: 15px;
     font-weight: bold;
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    white-space: pre-line; /* для переноса строки */
+    white-space: pre-line; /* важно для переноса строки */
 }
 
 .tip {
@@ -174,77 +173,6 @@ button:hover {
 }
 
 .show { opacity: 1; transform: translateY(0) scale(1); }
-
-/* Модалка (окно ввода ставки) */
-.modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 9999;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    width: 320px;
-    background: #2f2f50;
-    padding: 20px;
-    border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-    text-align: center;
-    color: #fff;
-}
-
-.modal-title {
-    font-size: 16px;
-    margin-bottom: 12px;
-}
-
-.modal-input {
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: none;
-    outline: none;
-    font-size: 16px;
-    text-align: center;
-    background: rgba(255,255,255,0.03);
-    color: #fff;
-}
-
-.modal-actions {
-    margin-top: 14px;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-}
-
-.modal-actions button {
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.btn-confirm {
-    background: linear-gradient(90deg, #ffcc33, #ffaa00);
-    color: #111;
-}
-
-.btn-cancel {
-    background: rgba(255,255,255,0.06);
-    color: #fff;
-}
-
-.error {
-    margin-top: 8px;
-    color: #ff8b8b;
-    font-size: 13px;
-    display: none;
-}
-
 </style>
 </head>
 <body>
@@ -272,19 +200,6 @@ button:hover {
     </div>
 </div>
 
-<!-- Модальное окно -->
-<div class="modal" id="betModal" aria-hidden="true">
-    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-        <div class="modal-title" id="modalTitle">Введите сумму ставки</div>
-        <input id="betInput" class="modal-input" type="number" min="1" placeholder="100">
-        <div class="error" id="betError">Введите корректную сумму</div>
-        <div class="modal-actions">
-            <button class="btn-confirm" id="confirmBet">OK</button>
-            <button class="btn-cancel" id="cancelBet">Отмена</button>
-        </div>
-    </div>
-</div>
-
 <script>
 let currentLang = 'RU';
 const texts = {
@@ -293,22 +208,14 @@ const texts = {
         button: 'Получить сигнал',
         blocks: 'Сколько блоков\nставить',
         tip: (m) => `Если вы сделали больше чем x${m} от ставки, забирайте выигрыш! Даже если бот сказал ставить больше ставок`,
-        loading: 'Подождите, идет анализ...',
-        prompt: 'Введите сумму ставки',
-        placeholder: 'Например 100',
-        confirm: 'OK',
-        cancel: 'Отмена'
+        loading: 'Подождите, идет анализ...'
     },
     EN: {
         title: '🎲 TOWER RUSH',
         button: 'Get Signal',
         blocks: 'How many blocks\nto place',
         tip: (m) => `If you made more than x${m} of your bet, take your winnings! Even if the bot suggested more bets`,
-        loading: 'Please wait, analyzing...',
-        prompt: 'Enter your bet amount',
-        placeholder: 'For example 100',
-        confirm: 'OK',
-        cancel: 'Cancel'
+        loading: 'Please wait, analyzing...'
     }
 };
 
@@ -325,57 +232,12 @@ function updateTexts() {
     document.getElementById('getSignal').textContent = t.button;
     document.getElementById('blocksText').textContent = t.blocks;
     document.getElementById('tipText').textContent = t.tip('X');
-    document.getElementById('modalTitle').textContent = t.prompt;
-    document.getElementById('betInput').placeholder = t.placeholder;
-    document.getElementById('confirmBet').textContent = t.confirm;
-    document.getElementById('cancelBet').textContent = t.cancel;
 }
 
 function getRandomInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
 function getRandomFloat(min,max,d=1){return (Math.random()*(max-min)+min).toFixed(d);}
 
-// Modal elements
-const betModal = document.getElementById('betModal');
-const betInput = document.getElementById('betInput');
-const confirmBtn = document.getElementById('confirmBet');
-const cancelBtn = document.getElementById('cancelBet');
-const betError = document.getElementById('betError');
-
 document.getElementById('getSignal').addEventListener('click', () => {
-    updateTexts();
-    betError.style.display = 'none';
-    betInput.value = '';
-    betModal.style.display = 'flex';
-    betModal.setAttribute('aria-hidden','false');
-    setTimeout(()=>betInput.focus(),50);
-});
-
-cancelBtn.addEventListener('click', closeModal);
-function closeModal(){
-    betModal.style.display = 'none';
-    betModal.setAttribute('aria-hidden','true');
-    betError.style.display = 'none';
-    betInput.value = '';
-}
-
-confirmBtn.addEventListener('click', () => {
-    const val = betInput.value.trim();
-    if (!val || isNaN(val) || Number(val) <= 0) {
-        betError.style.display = 'block';
-        betInput.focus();
-        return;
-    }
-    betError.style.display = 'none';
-    closeModal();
-    startAnalysis();
-});
-
-betInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') confirmBtn.click();
-    if (e.key === 'Escape') closeModal();
-});
-
-function startAnalysis() {
     const loader = document.getElementById('loader');
     const resultNumber = document.getElementById('resultNumber');
     const tipText = document.getElementById('tipText');
@@ -391,7 +253,7 @@ function startAnalysis() {
 
     setTimeout(() => {
         loader.style.display = 'none';
-        const number = getRandomInt(3,6);
+        const number = getRandomInt(2,7);
         const multiplier = getRandomFloat(1.9,3.7);
 
         resultNumber.textContent = number;
@@ -402,16 +264,13 @@ function startAnalysis() {
         for(let i=0;i<number;i++){
             const block = document.createElement('div');
             block.className='tower-block';
-            block.style.bottom = `${i*40}px`;
-            const jitter = (Math.random()*18 - 9).toFixed(1);
-            block.style.left = `${jitter}px`;
-            block.style.animationDelay = `${i*0.28}s`;
+            block.style.bottom=`${i*40}px`;
+            block.style.left=`${Math.random()*10-5}px`;
+            block.style.animationDelay=`${i*0.3}s`;
             towerStack.appendChild(block);
         }
-    }, 900);
-}
-
-updateTexts();
+    },1200);
+});
 </script>
 
 </body>
