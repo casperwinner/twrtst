@@ -232,19 +232,16 @@
 
 <script>
 (function(){
-    const ID_KEY = 'towerRushGameId';
     let currentLang = 'RU';
 
     const t = {
         RU:{title:'TOWER RUSH', statusReady:'Готов к сигналу', statusNeedId:'Введите ID',
             idLabel:'ID игры', idPlaceholder:'Введите ID', idHintEmpty:'Укажите ID игры. Его нужно ввести только 1 раз.',
-            idHintSaved:'ID сохранён. При необходимости перезагрузите страницу для смены.',
             caption:'Сколько блоков подряд поставить', btnSignal:'ПОЛУЧИТЬ СИГНАЛ',
             loading:'Подождите, идёт анализ…',
             tip:(m)=>`Если вы сделали больше чем x${m} от ставки, забирайте выигрыш! Даже если бот сказал ставить больше блоков.`},
         EN:{title:'TOWER RUSH', statusReady:'Ready for signal', statusNeedId:'Enter ID',
             idLabel:'Game ID', idPlaceholder:'Enter ID', idHintEmpty:'Enter your Game ID once. You won’t need to type it again.',
-            idHintSaved:'ID saved. Reload the page if you need to change it.',
             caption:'How many blocks in a row to place', btnSignal:'GET SIGNAL',
             loading:'Please wait, analyzing…',
             tip:(m)=>`If you made more than x${m} of your bet, take your winnings! Even if the bot suggested more blocks.`}
@@ -279,25 +276,20 @@
     function applyTexts(){
         const L = t[currentLang];
         els.title.textContent = L.title;
-        els.statusText.textContent = hasId()?L.statusReady:L.statusNeedId;
         els.idLabel.textContent = L.idLabel;
         els.gameId.placeholder = L.idPlaceholder;
-        els.idHint.textContent = hasId()?L.idHintSaved:L.idHintEmpty;
+        els.idHint.textContent = L.idHintEmpty;
         els.caption.textContent = L.caption;
         els.getSignal.textContent = L.btnSignal;
         if(els.tipText.dataset.dynamic!=='1'){els.tipText.textContent = L.tip('2.8');}
     }
 
-    
-
     els.saveId.addEventListener('click', ()=>{
         const val=(els.gameId.value||'').trim();
         if(!val) return;
-        localStorage.setItem(ID_KEY,val);
         els.idCard.style.display='none';
         els.statusPill.classList.remove('pending');
         els.statusText.textContent=t[currentLang].statusReady;
-        els.idHint.textContent=t[currentLang].idHintSaved;
     });
 
     els.getSignal.addEventListener('click', ()=>{
@@ -310,7 +302,7 @@
 
         setTimeout(()=>{
             els.loader.style.display='none';
-            const number=getRandomInt(1,7);
+            const number=getRandomInt(2,7);
             const mult=getRandomFloat(1.5,2.8);
             els.resultNumber.textContent=number;
             els.resultNumber.classList.add('show');
