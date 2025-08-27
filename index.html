@@ -154,7 +154,6 @@
         transform: translate(-50%,-60%) scale(.8);
         font-size:112px; font-weight:900; letter-spacing:2px;
         color: var(--accent);
-        
         opacity:0; transition:.45s ease;
         pointer-events:none;
     }
@@ -233,6 +232,7 @@
 <script>
 (function(){
     let currentLang = 'RU';
+    let idEntered = false; // новый флаг, каждый заход требует ввод ID
 
     const t = {
         RU:{title:'TOWER RUSH', statusReady:'Готов к сигналу', statusNeedId:'Введите ID',
@@ -281,18 +281,25 @@
         els.idHint.textContent = L.idHintEmpty;
         els.caption.textContent = L.caption;
         els.getSignal.textContent = L.btnSignal;
+        els.statusText.textContent = idEntered ? L.statusReady : L.statusNeedId;
+
         if(els.tipText.dataset.dynamic!=='1'){els.tipText.textContent = L.tip('2.8');}
     }
 
     els.saveId.addEventListener('click', ()=>{
         const val=(els.gameId.value||'').trim();
         if(!val) return;
+        idEntered = true;
         els.idCard.style.display='none';
         els.statusPill.classList.remove('pending');
         els.statusText.textContent=t[currentLang].statusReady;
     });
 
     els.getSignal.addEventListener('click', ()=>{
+        if(!idEntered){
+            alert(t[currentLang].statusNeedId);
+            return;
+        }
         els.loader.style.display='block';
         els.resultNumber.classList.remove('show');
         els.tipText.classList.remove('show');
@@ -302,8 +309,8 @@
 
         setTimeout(()=>{
             els.loader.style.display='none';
-            const number=getRandomInt(2,7);
-            const mult=getRandomFloat(1.5,2.8);
+            const number=getRandomInt(1,6);
+            const mult=getRandomFloat(1.4,2.8);
             els.resultNumber.textContent=number;
             els.resultNumber.classList.add('show');
             els.tipText.textContent=t[currentLang].tip(mult);
