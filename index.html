@@ -288,15 +288,7 @@
         if(els.tipText.dataset.dynamic!=='1'){els.tipText.textContent = L.tip('2.8');}
     }
 
-    function hasId(){ return !!localStorage.getItem(ID_KEY); }
-
-    const storedId = localStorage.getItem(ID_KEY);
-    if(storedId){
-        els.gameId.value = storedId;
-        els.idCard.style.display='none';
-        els.statusPill.classList.remove('pending');
-        els.statusText.textContent=t[currentLang].statusReady;
-    }
+    
 
     els.saveId.addEventListener('click', ()=>{
         const val=(els.gameId.value||'').trim();
