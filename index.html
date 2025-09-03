@@ -33,6 +33,7 @@
         align-items:center;
         justify-content:center;
         padding:24px;
+        position:relative;
     }
 
     .container{
@@ -188,9 +189,41 @@
         transition:.35s ease;
     }
     .tip.show{ opacity:1; transform: translateY(0) }
+
+    /* фиксированная кнопка назад */
+    #backButton{
+        position: fixed;
+        top:14px;
+        left:14px;
+        display:flex;
+        align-items:center;
+        gap:6px;
+        height:40px;
+        background:#384560;
+        border:none;
+        border-radius:12px;
+        color:#fff;
+        font-weight:700;
+        font-size:14px;
+        padding:0 12px;
+        cursor:pointer;
+        transition:0.15s ease background, 0.15s ease transform;
+        z-index:9999;
+    }
+    #backButton:hover{ background:#2f3b55; transform: translateY(-1px); }
+    #backButton svg{ width:18px; height:18px; }
 </style>
 </head>
 <body>
+
+<button id="backButton">
+    <svg viewBox="0 0 24 24" fill="none">
+        <path d="M19 12H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span>Назад</span>
+</button>
+
 <div class="container">
     <div class="language-switch" id="languageSwitch">
         <span>RU</span><span>EN</span>
@@ -232,7 +265,7 @@
 <script>
 (function(){
     let currentLang = 'RU';
-    let idEntered = false; // новый флаг, каждый заход требует ввод ID
+    let idEntered = false;
 
     const t = {
         RU:{title:'TOWER RUSH', statusReady:'Готов к сигналу', statusNeedId:'Введите ID',
@@ -261,7 +294,8 @@
         getSignal: document.getElementById('getSignal'),
         loader: document.getElementById('loader'),
         resultNumber: document.getElementById('resultNumber'),
-        tipText: document.getElementById('tipText')
+        tipText: document.getElementById('tipText'),
+        backButton: document.getElementById('backButton')
     };
 
     function getRandomInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
@@ -320,10 +354,12 @@
         },1200);
     });
 
+    els.backButton.addEventListener('click', ()=>{
+        window.location.href='https://casperwinner.github.io/vexorhex/';
+    });
+
     applyTexts();
 })();
 </script>
 </body>
 </html>
-
-
