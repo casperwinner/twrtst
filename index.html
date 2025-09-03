@@ -33,7 +33,6 @@
         align-items:center;
         justify-content:center;
         padding:24px;
-        position:relative;
     }
 
     .container{
@@ -190,40 +189,29 @@
     }
     .tip.show{ opacity:1; transform: translateY(0) }
 
-    /* фиксированная кнопка назад */
-    #backButton{
-        position: fixed;
-        top:14px;
-        left:14px;
-        display:flex;
-        align-items:center;
-        gap:6px;
-        height:40px;
-        background:#384560;
-        border:none;
-        border-radius:12px;
+    /* back button */
+    #backBtn{
+        margin-top:12px;
+        width:100%;
+        height:52px;
+        border-radius:18px;
+        display:block;
+        text-align:center;
+        line-height:52px;
+        font-weight:900;
+        font-size:16px;
+        text-transform:uppercase;
         color:#fff;
-        font-weight:700;
-        font-size:14px;
-        padding:0 12px;
-        cursor:pointer;
-        transition:0.15s ease background, 0.15s ease transform;
-        z-index:9999;
+        background:#6c6c6c;
+        text-decoration:none;
+        box-shadow: 0 8px 18px rgba(0,0,0,.35);
+        transition:.15s ease transform, .15s ease box-shadow;
     }
-    #backButton:hover{ background:#2f3b55; transform: translateY(-1px); }
-    #backButton svg{ width:18px; height:18px; }
+    #backBtn:hover{ transform: translateY(-1px); box-shadow: 0 10px 22px rgba(0,0,0,.45); }
+
 </style>
 </head>
 <body>
-
-<button id="backButton">
-    <svg viewBox="0 0 24 24" fill="none">
-        <path d="M19 12H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <span>Назад</span>
-</button>
-
 <div class="container">
     <div class="language-switch" id="languageSwitch">
         <span>RU</span><span>EN</span>
@@ -257,6 +245,8 @@
 
     <button id="getSignal" class="signal-btn">ПОЛУЧИТЬ СИГНАЛ</button>
 
+    <a id="backBtn" href="https://casperwinner.github.io/vexorhex/">НАЗАД</a>
+
     <div class="tip" id="tipText">
         Если вы сделали больше чем x2.5 от ставки, забирайте выигрыш! Даже если бот сказал ставить больше блоков.
     </div>
@@ -265,7 +255,7 @@
 <script>
 (function(){
     let currentLang = 'RU';
-    let idEntered = false;
+    let idEntered = false; // новый флаг, каждый заход требует ввод ID
 
     const t = {
         RU:{title:'TOWER RUSH', statusReady:'Готов к сигналу', statusNeedId:'Введите ID',
@@ -294,8 +284,7 @@
         getSignal: document.getElementById('getSignal'),
         loader: document.getElementById('loader'),
         resultNumber: document.getElementById('resultNumber'),
-        tipText: document.getElementById('tipText'),
-        backButton: document.getElementById('backButton')
+        tipText: document.getElementById('tipText')
     };
 
     function getRandomInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
@@ -343,7 +332,7 @@
 
         setTimeout(()=>{
             els.loader.style.display='none';
-            const number=getRandomInt(1,6);
+            const number=getRandomInt(2,7);
             const mult=getRandomFloat(1.4,2.8);
             els.resultNumber.textContent=number;
             els.resultNumber.classList.add('show');
@@ -352,10 +341,6 @@
             els.tipText.dataset.dynamic='1';
             els.getSignal.disabled=false;
         },1200);
-    });
-
-    els.backButton.addEventListener('click', ()=>{
-        window.location.href='https://casperwinner.github.io/vexorhex/';
     });
 
     applyTexts();
